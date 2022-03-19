@@ -4,7 +4,6 @@ import {
   Get,
   Next,
   Post,
-  Request,
   Response,
 } from "@nestjs/common";
 import {
@@ -21,7 +20,6 @@ export class DiscussionController {
 
   @Get()
   public async getDiscussions(
-    @Request() req: RequestExpress,
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {

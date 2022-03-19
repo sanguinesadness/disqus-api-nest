@@ -16,6 +16,7 @@ import { WebsiteModule } from "./website/website.module";
 import { WebsiteMiddleware } from "./middlewares/website.middleware";
 import { WebsiteService } from "./website/website.service";
 import { DiscussionModule } from "./discussion/discussion.module";
+import { CommentModule } from "./comment/comment.module";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { DiscussionModule } from "./discussion/discussion.module";
     MailModule,
     WebsiteModule,
     DiscussionModule,
+    CommentModule
   ],
   controllers: [AppController],
   providers: [AppService, TokenService, WebsiteService],
@@ -38,5 +40,9 @@ export class AppModule implements NestModule {
     consumer
       .apply(WebsiteMiddleware)
       .forRoutes({ path: "discussion", method: RequestMethod.ALL });
+
+    consumer
+      .apply(AuthMiddleware)
+      .forRoutes({ path: "comment", method: RequestMethod.ALL });
   }
 }
