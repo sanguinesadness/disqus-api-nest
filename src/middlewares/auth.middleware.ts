@@ -23,8 +23,8 @@ export class AuthMiddleware implements NestMiddleware {
 
       req.body.userId = user.id;
       next();
-    } catch (err) {
-      next(err);
+    } catch (error) {
+      next(error);
     }
   }
 }

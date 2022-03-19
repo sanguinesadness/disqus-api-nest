@@ -31,12 +31,11 @@ export class UserController {
   @Get()
   public async getUsers(
     @Response() res: ResponseExpress,
-    @Request() req: RequestExpress,
     @Next() next: NextFunction,
   ) {
     try {
       const users = await this.userService.findAll();
-      return res.json({ ...users, d: req.body });
+      return res.json(users);
     } catch (error) {
       next(error);
     }
