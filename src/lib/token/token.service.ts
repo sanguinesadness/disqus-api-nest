@@ -2,8 +2,8 @@ import { Injectable } from "@nestjs/common";
 import { Prisma, PrismaClient, Token, User } from "@prisma/client";
 import jwt from "jsonwebtoken";
 import {
-  ACCESS_EXPIRATION_TIME,
-  REFRESH_EXPIRATION_TIME,
+  USER_JWT_ACCESS_EXPIRATION_TIME,
+  USER_JWT_REFRESH_EXPIRATION_TIME,
 } from "src/constants/jwt-expiration";
 import { Tokens } from "./types/tokens";
 
@@ -44,12 +44,12 @@ export class TokenService {
   }
 
   public generateTokens(payload: User): Tokens {
-    const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_KEY, {
-      expiresIn: ACCESS_EXPIRATION_TIME.str,
+    const accessToken = jwt.sign(payload, process.env.USER_JWT_ACCESS_KEY, {
+      expiresIn: USER_JWT_ACCESS_EXPIRATION_TIME.str,
     });
 
-    const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_KEY, {
-      expiresIn: REFRESH_EXPIRATION_TIME.str,
+    const refreshToken = jwt.sign(payload, process.env.USER_JWT_REFRESH_KEY, {
+      expiresIn: USER_JWT_REFRESH_EXPIRATION_TIME.str,
     });
 
     return {
@@ -78,7 +78,7 @@ export class TokenService {
 
   public validateAccessToken(token: string): User | null {
     try {
-      const data = jwt.verify(token, process.env.JWT_ACCESS_KEY) as User;
+      const data = jwt.verify(token, process.env.USER_JWT_ACCESS_KEY) as User;
       return data;
     } catch {
       return null;
@@ -87,7 +87,7 @@ export class TokenService {
 
   public validateRefreshToken(token: string): User | null {
     try {
-      const data = jwt.verify(token, process.env.JWT_REFRESH_KEY) as User;
+      const data = jwt.verify(token, process.env.USER_JWT_REFRESH_KEY) as User;
       return data;
     } catch {
       return null;

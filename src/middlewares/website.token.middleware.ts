@@ -5,10 +5,10 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
-import { WebsiteService } from "src/website/website.service";
+import { WebsiteService } from "src/main/website/website.service";
 
 @Injectable()
-export class WebsiteMiddleware implements NestMiddleware {
+export class WebsiteTokenMiddleware implements NestMiddleware {
   constructor(private websiteService: WebsiteService) {}
 
   async use(req: Request, res: Response, next: NextFunction) {

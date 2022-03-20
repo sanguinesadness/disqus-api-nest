@@ -4,10 +4,10 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { NextFunction, Request, Response } from "express";
-import { TokenService } from "src/token/token.service";
+import { TokenService } from "src/lib/token/token.service";
 
 @Injectable()
-export class AuthMiddleware implements NestMiddleware {
+export class UserAuthMiddleware implements NestMiddleware {
   constructor(private tokenService: TokenService) {}
 
   use(req: Request, res: Response, next: NextFunction) {

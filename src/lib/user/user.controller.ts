@@ -12,18 +12,18 @@ import {
   Request as RequestExpress,
   Response as ResponseExpress,
 } from "express";
-import { REFRESH_EXPIRATION_TIME } from "src/constants/jwt-expiration";
+import { USER_JWT_REFRESH_EXPIRATION_TIME } from "src/constants/jwt-expiration";
 import { LoginUserDto } from "./dto/login.dto";
 import { RegisterUserDto } from "./dto/register.dto";
 import { UserService } from "./user.service";
 
-@Controller("/user")
+@Controller("user")
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   private setRefreshTokenCookie(res: ResponseExpress, token: string) {
     res.cookie("refreshToken", token, {
-      maxAge: REFRESH_EXPIRATION_TIME.num,
+      maxAge: USER_JWT_REFRESH_EXPIRATION_TIME.num,
       httpOnly: true,
     });
   }
@@ -82,7 +82,6 @@ export class UserController {
     try {
       const regResult = await this.userService.register(dto);
       this.setRefreshTokenCookie(res, regResult.tokens.refresh);
-
       return res.json(regResult);
     } catch (error) {
       next(error);

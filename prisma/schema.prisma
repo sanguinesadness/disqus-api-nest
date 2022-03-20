@@ -45,9 +45,13 @@ model User {
 }
 
 model Website {
-  id         String       @id(map: "website_pk") @default(uuid()) @db.VarChar
-  url        String       @unique(map: "website_url_uindex") @db.VarChar
-  name       String       @db.VarChar
-  token      String       @unique(map: "website_token_uindex") @default(uuid()) @db.VarChar
-  discussion Discussion[]
+  id             String       @id(map: "website_pk") @default(uuid()) @db.VarChar
+  url            String       @unique(map: "website_url_uindex") @db.VarChar
+  name           String       @db.VarChar
+  email          String       @unique(map: "website_email_uindex") @db.VarChar
+  password       String       @db.VarChar
+  isActivated    Boolean?     @default(false)
+  activationLink String?      @db.VarChar
+  token          String       @unique(map: "website_token_uindex") @default(uuid()) @db.VarChar
+  discussion     Discussion[]
 }

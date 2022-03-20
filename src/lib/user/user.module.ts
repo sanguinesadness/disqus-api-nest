@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import { MailService } from "src/mail/mail.service";
-import { TokenService } from "src/token/token.service";
+import { TokenService } from "src/lib/token/token.service";
 import { UserController } from "./user.controller";
 import { UserService } from "./user.service";
 

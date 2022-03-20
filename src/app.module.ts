@@ -7,36 +7,59 @@ import {
 import { ConfigModule } from "@nestjs/config";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
-import { UserModule } from "./user/user.module";
-import { TokenModule } from "./token/token.module";
+import { UserModule } from "./lib/user/user.module";
+import { TokenModule as UserTokenModule } from "./lib/token/token.module";
+import { TokenModule as WebsiteTokenModule } from "./main/token/token.module";
+import { TokenService as UserTokenService } from "./lib/token/token.service";
+import { TokenService as WebsiteTokenService } from "./main/token/token.service";
 import { MailModule } from "./mail/mail.module";
-import { AuthMiddleware } from "./middlewares/auth.middleware";
-import { TokenService } from "./token/token.service";
-import { WebsiteModule } from "./website/website.module";
-import { WebsiteMiddleware } from "./middlewares/website.middleware";
-import { WebsiteService } from "./website/website.service";
-import { DiscussionModule } from "./discussion/discussion.module";
-import { CommentModule } from "./comment/comment.module";
+import { UserAuthMiddleware } from "./middlewares/user.auth.middleware";
+import { WebsiteModule } from "./main/website/website.module";
+import { WebsiteTokenMiddleware } from "./middlewares/website.token.middleware";
+import { WebsiteService } from "./main/website/website.service";
+import { DiscussionModule } from "./lib/discussion/discussion.module";
+import { CommentModule } from "./lib/comment/comment.module";
+import { MailService } from "./mail/mail.service";
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
     UserModule,
-    TokenModule,
+    UserTokenModule,
+    WebsiteTokenModule,
     MailModule,
     WebsiteModule,
     DiscussionModule,
     CommentModule,
   ],
   controllers: [AppController],
-  providers: [AppService, TokenService, WebsiteService],
+  providers: [
+    AppService,
+    UserTokenService,
+    WebsiteTokenService,
+    WebsiteService,
+    MailService,
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(WebsiteMiddleware).forRoutes("*");
-
     consumer
-      .apply(AuthMiddleware)
-      .forRoutes({ path: "comment", method: RequestMethod.ALL });
+      .apply(WebsiteTokenMiddleware)
+      .exclude(
+        {
+          path: `${process.env.API_PREFIX}/website/(.*)`,
+          method: RequestMethod.ALL,
+        },
+        {
+          path: `${process.env.API_PREFIX}/website`,
+          method: RequestMethod.GET,
+        },
+      )
+      .forRoutes("*");
+
+    consumer.apply(UserAuthMiddleware).forRoutes({
+      path: "comment",
+      method: RequestMethod.ALL,
+    });
   }
 }
