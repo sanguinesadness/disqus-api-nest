@@ -26,20 +26,14 @@ import { CommentModule } from "./comment/comment.module";
     MailModule,
     WebsiteModule,
     DiscussionModule,
-    CommentModule
+    CommentModule,
   ],
   controllers: [AppController],
   providers: [AppService, TokenService, WebsiteService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(AuthMiddleware)
-      .forRoutes({ path: "user", method: RequestMethod.GET });
-
-    consumer
-      .apply(WebsiteMiddleware)
-      .forRoutes({ path: "discussion", method: RequestMethod.ALL });
+    consumer.apply(WebsiteMiddleware).forRoutes("*");
 
     consumer
       .apply(AuthMiddleware)

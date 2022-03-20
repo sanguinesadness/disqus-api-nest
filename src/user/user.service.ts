@@ -41,6 +41,12 @@ export class UserService {
     return await this.prisma.user.findFirst({ where: { activationLink } });
   }
 
+  public async findByWebsiteId(id: string): Promise<User[]> {
+    return await this.prisma.user.findMany({
+      where: { comment: { some: { discussion: { websiteId: id } } } },
+    });
+  }
+
   public async updateOne(
     id: string,
     data: Prisma.UserUpdateInput,

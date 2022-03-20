@@ -6,8 +6,13 @@ import {
   Next,
   Post,
   Response,
+  Request,
 } from "@nestjs/common";
-import { NextFunction, Response as ResponseExpress } from "express";
+import {
+  NextFunction,
+  Response as ResponseExpress,
+  Request as RequestExpress,
+} from "express";
 import { CommentService } from "./comment.service";
 import { CreateCommentDto } from "./dto/create.dto";
 import { DeleteCommentDto } from "./dto/delete.dto";
@@ -16,8 +21,8 @@ import { DeleteCommentDto } from "./dto/delete.dto";
 export class CommentController {
   constructor(private commentService: CommentService) {}
 
-  @Get()
-  public async getComments(
+  @Get("/all")
+  public async getAllComments(
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
@@ -29,9 +34,25 @@ export class CommentController {
     }
   }
 
+  @Get()
+  public async getWebsiteComments(
+    @Request() req: RequestExpress,
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const comments = await this.commentService.findByWebsiteId(
+        req.cookies.websiteId,
+      );
+      return res.json(comments);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   @Post()
   public async create(
-    @Body() dto: CreateCommentDto,
+    @Body() dto: CreateCommentDto & { websiteId: string },
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {

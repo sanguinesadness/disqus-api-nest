@@ -13,14 +13,14 @@ export class WebsiteMiddleware implements NestMiddleware {
 
   async use(req: Request, res: Response, next: NextFunction) {
     try {
-      if (!req.cookies.token)
+      if (!req.cookies.websiteToken)
         throw new BadRequestException("Website Token was not provided");
-      const { token } = req.cookies;
+      const { websiteToken } = req.cookies;
 
-      const website = await this.websiteService.findByToken(token);
+      const website = await this.websiteService.findByToken(websiteToken);
       if (!website) throw new UnauthorizedException();
 
-      req.body.websiteId = website.id;
+      req.cookies.websiteId = website.id;
       next();
     } catch (error) {
       next(error);

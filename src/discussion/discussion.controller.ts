@@ -4,6 +4,7 @@ import {
   Get,
   Next,
   Post,
+  Request,
   Response,
 } from "@nestjs/common";
 import {
@@ -18,8 +19,8 @@ import { CreateDiscussionDto } from "./dto/create.dto";
 export class DiscussionController {
   constructor(private discussionService: DiscussionService) {}
 
-  @Get()
-  public async getDiscussions(
+  @Get("/all")
+  public async getAllDiscussions(
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
@@ -31,14 +32,34 @@ export class DiscussionController {
     }
   }
 
-  @Post()
-  public async create(
-    @Body() dto: CreateDiscussionDto,
+  @Get()
+  public async getWebsiteDiscussions(
+    @Request() req: RequestExpress,
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
     try {
-      const discussion = await this.discussionService.createOne(dto);
+      const discussions = await this.discussionService.findByWebsiteId(
+        req.cookies.websiteId,
+      );
+      return res.json(discussions);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  @Post()
+  public async create(
+    @Body() dto: CreateDiscussionDto,
+    @Request() req: RequestExpress,
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const discussion = await this.discussionService.createOne(
+        dto.name,
+        req.cookies.websiteId,
+      );
       return res.json(discussion);
     } catch (error) {
       next(error);

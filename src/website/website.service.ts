@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { Prisma, PrismaClient, Website } from "@prisma/client";
+import { PrismaClient, Website } from "@prisma/client";
 import { CreateWebsiteDto } from "./dto/create.dto";
 
 @Injectable()

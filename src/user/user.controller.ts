@@ -28,13 +28,29 @@ export class UserController {
     });
   }
 
-  @Get()
-  public async getUsers(
+  @Get("/all")
+  public async getAllUsers(
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
     try {
       const users = await this.userService.findAll();
+      return res.json(users);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  @Get()
+  public async getWebsiteUsers(
+    @Request() req: RequestExpress,
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const users = await this.userService.findByWebsiteId(
+        req.cookies.websiteId,
+      );
       return res.json(users);
     } catch (error) {
       next(error);
