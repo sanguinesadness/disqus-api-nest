@@ -33,6 +33,34 @@ export class WebsiteController {
     }
   }
 
+  @Get("/current")
+  public async getCurrentWebsite(
+    @Body() body: { websiteId: string },
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const website = await this.websiteService.findById(body.websiteId);
+      return res.json(website);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  @Get("/token")
+  public async getWebsiteToken(
+    @Body() body: { websiteId: string },
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const token = await this.websiteService.findToken(body.websiteId);
+      return res.json(token);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   @Get("/activate/:link")
   public async activate(
     @Request() req: RequestExpress,
@@ -55,7 +83,7 @@ export class WebsiteController {
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
-    try {      
+    try {
       const regResult = await this.websiteService.register(dto);
       return res.json(regResult);
     } catch (error) {

@@ -20,6 +20,7 @@ import { WebsiteService } from "./main/website/website.service";
 import { DiscussionModule } from "./lib/discussion/discussion.module";
 import { CommentModule } from "./lib/comment/comment.module";
 import { MailService } from "./mail/mail.service";
+import { WebsiteAuthMiddleware } from "./middlewares/website.auth.middleware";
 
 @Module({
   imports: [
@@ -57,9 +58,29 @@ export class AppModule implements NestModule {
       )
       .forRoutes("*");
 
-    consumer.apply(UserAuthMiddleware).forRoutes({
-      path: "comment",
-      method: RequestMethod.ALL,
-    });
+    consumer.apply(UserAuthMiddleware).forRoutes(
+      {
+        path: "comment",
+        method: RequestMethod.ALL,
+      },
+      {
+        path: `/user/current`,
+        method: RequestMethod.GET,
+      },
+    );
+
+    consumer
+      .apply(WebsiteAuthMiddleware)
+      .exclude(
+        {
+          path: `${process.env.API_PREFIX}/website/login`,
+          method: RequestMethod.POST,
+        },
+        {
+          path: `${process.env.API_PREFIX}/website/register`,
+          method: RequestMethod.POST,
+        },
+      )
+      .forRoutes({ path: "website/*", method: RequestMethod.ALL });
   }
 }

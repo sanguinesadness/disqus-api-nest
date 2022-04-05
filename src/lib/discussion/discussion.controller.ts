@@ -58,6 +58,7 @@ export class DiscussionController {
     try {
       const discussion = await this.discussionService.createOne(
         dto.name,
+        dto.text,
         req.cookies.websiteId,
       );
       return res.json(discussion);

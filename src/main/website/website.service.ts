@@ -25,6 +25,10 @@ export class WebsiteService {
     return this.prisma.website.findUnique({ where: { url } });
   }
 
+  public async findById(id: string): Promise<Website> {
+    return this.prisma.website.findUnique({ where: { id } });
+  }
+
   public async findByEmail(email: string): Promise<Website> {
     return this.prisma.website.findUnique({ where: { email } });
   }
@@ -43,6 +47,13 @@ export class WebsiteService {
 
   public async createOne(data: Prisma.WebsiteCreateInput) {
     return this.prisma.website.create({ data });
+  }
+
+  public async findToken(websiteId: string): Promise<string> {
+    const website = await this.findById(websiteId);
+    if (!website) throw new BadRequestException("No website found");
+
+    return website.token;
   }
 
   public async register(dto: RegisterWebsiteDto): Promise<WebsiteToken> {
@@ -79,7 +90,7 @@ export class WebsiteService {
     if (!website) throw new BadRequestException("No website found");
 
     const isPassCorrect = await bcrypt.compare(dto.password, website.password);
-    if (!isPassCorrect) throw new BadRequestException("Password is incorrect");
+    if (!isPassCorrect) throw new BadRequestException("Incorrent password");
 
     const accessToken = this.tokenService.generateToken(website);
 
@@ -91,7 +102,8 @@ export class WebsiteService {
 
   public async activate(activationLink: string) {
     const websiteFromDb = await this.findByLink(activationLink);
-    if (!websiteFromDb) throw new BadRequestException("Incorrect activation link");
+    if (!websiteFromDb)
+      throw new BadRequestException("Incorrect activation link");
 
     websiteFromDb.isActivated = true;
     await this.updateOne(websiteFromDb.id, websiteFromDb);

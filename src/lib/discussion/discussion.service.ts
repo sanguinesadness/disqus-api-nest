@@ -10,7 +10,10 @@ export class DiscussionService {
   }
 
   public async findByWebsiteId(id: string): Promise<Discussion[]> {
-    return await this.prisma.discussion.findMany({ where: { websiteId: id } });
+    return await this.prisma.discussion.findMany({
+      where: { websiteId: id },
+      include: { comment: true },
+    });
   }
 
   public async find(name: string, websiteId: string): Promise<Discussion> {
@@ -19,10 +22,16 @@ export class DiscussionService {
     });
   }
 
-  public async createOne(name: string, websiteId: string): Promise<Discussion> {
+  public async createOne(
+    name: string,
+    text: string,
+    websiteId: string,
+  ): Promise<Discussion> {
     const existingDiscussion = await this.find(name, websiteId);
     if (existingDiscussion)
       throw new BadRequestException("Name is already taken");
-    return await this.prisma.discussion.create({ data: { name, websiteId } });
+    return await this.prisma.discussion.create({
+      data: { name, text, websiteId },
+    });
   }
 }

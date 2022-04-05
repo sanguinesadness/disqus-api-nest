@@ -57,6 +57,20 @@ export class UserController {
     }
   }
 
+  @Get("/current")
+  public async getCurrentUser(
+    @Body() body: { userId: string },
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const user = await this.userService.findById(body.userId);
+      return res.json(user);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   @Get("/activate/:link")
   public async activate(
     @Request() req: RequestExpress,
@@ -75,12 +89,16 @@ export class UserController {
 
   @Post("/register")
   public async register(
-    @Body() dto: RegisterUserDto,
+    @Body() body: RegisterUserDto,
+    @Request() req: RequestExpress,
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
     try {
-      const regResult = await this.userService.register(dto);
+      const regResult = await this.userService.register(
+        body,
+        req.cookies.websiteId,
+      );
       this.setRefreshTokenCookie(res, regResult.tokens.refresh);
       return res.json(regResult);
     } catch (error) {
@@ -90,12 +108,16 @@ export class UserController {
 
   @Post("/login")
   public async login(
-    @Body() dto: LoginUserDto,
+    @Body() body: LoginUserDto,
+    @Request() req: RequestExpress,
     @Response() res: ResponseExpress,
     @Next() next: NextFunction,
   ) {
     try {
-      const logResult = await this.userService.login(dto);
+      const logResult = await this.userService.login(
+        body,
+        req.cookies.websiteId,
+      );
       this.setRefreshTokenCookie(res, logResult.tokens.refresh);
 
       return res.json(logResult);

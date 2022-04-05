@@ -41,9 +41,9 @@ export class UserService {
     return await this.prisma.user.findFirst({ where: { activationLink } });
   }
 
-  public async findByWebsiteId(id: string): Promise<User[]> {
+  public async findByWebsiteId(websiteId: string): Promise<User[]> {
     return await this.prisma.user.findMany({
-      where: { comment: { some: { discussion: { websiteId: id } } } },
+      where: { websiteId },
     });
   }
 
@@ -63,7 +63,10 @@ export class UserService {
     });
   }
 
-  public async register(dto: RegisterUserDto): Promise<UserTokens> {
+  public async register(
+    dto: RegisterUserDto,
+    websiteId: string,
+  ): Promise<UserTokens> {
     const userFromDb = await this.findByEmail(dto.email);
     if (userFromDb) throw new BadRequestException("Email is already taken");
 
@@ -76,6 +79,7 @@ export class UserService {
       password: hashedPassword,
       isActivated: false,
       activationLink,
+      websiteId,
     });
 
     await this.mailService.sendActivationMail(
@@ -92,12 +96,18 @@ export class UserService {
     };
   }
 
-  public async login(dto: LoginUserDto): Promise<UserTokens> {
+  public async login(
+    dto: LoginUserDto,
+    websiteId: string,
+  ): Promise<UserTokens> {
     const user = await this.findByEmail(dto.email);
     if (!user) throw new BadRequestException("No user found");
 
     const isPassCorrect = await bcrypt.compare(dto.password, user.password);
-    if (!isPassCorrect) throw new BadRequestException("Password is incorrect");
+    if (!isPassCorrect) throw new BadRequestException("Incorrect password");
+
+    if (websiteId !== user.websiteId)
+      throw new BadRequestException("User does not belong to this website");
 
     const tokens = this.tokenService.generateTokens(user);
     await this.tokenService.saveToken(user.id, tokens.refresh);

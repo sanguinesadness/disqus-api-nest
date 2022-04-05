@@ -64,6 +64,34 @@ export class CommentController {
     }
   }
 
+  @Post("/like")
+  public async like(
+    @Body() body: { commentId: string },
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const likes = await this.commentService.like(body.commentId);
+      return res.json(likes);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  @Post("/dislike")
+  public async dislike(
+    @Body() body: { commentId: string },
+    @Response() res: ResponseExpress,
+    @Next() next: NextFunction,
+  ) {
+    try {
+      const dislikes = await this.commentService.dislike(body.commentId);
+      return res.json(dislikes);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   @Delete()
   public async delete(
     @Body() dto: DeleteCommentDto,
